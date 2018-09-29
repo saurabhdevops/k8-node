@@ -56,6 +56,7 @@ npm start
    ```
    * This will deploy the `saurabhdevop/k8-node` image onto your okd cluster.
    * By default, it will create a k8 `Deployment Config`, `service` and `routes`.
+   * The same template objects can directly be used with any flavour or type of kuberentes you are using.
 
 ### CI / CD
    * We are using [GitLab CI](https://about.gitlab.com/features/gitlab-ci-cd/) as our CI/CD tool here.
