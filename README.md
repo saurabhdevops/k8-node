@@ -56,3 +56,8 @@ npm start
    ```
    * This will deploy the `saurabhdevop/k8-node` image onto your okd cluster.
    * By default, it will create a k8 `Deployment Config`, `service` and `routes`.
+
+### CI / CD
+   * We are using [GitLab CI](https://about.gitlab.com/features/gitlab-ci-cd/) as our CI/CD tool here.
+   * You will need to install a `Gitlab CI Runner` with [Docker](https://docs.gitlab.com/runner/install/docker.html) or [K8](https://docs.gitlab.com/runner/install/kubernetes.html) executors.
+   * You need to tag your runner with `DOCKER` tag or [add your custom tag] in the [Gitlab CI File](.gitlab-ci.yml)

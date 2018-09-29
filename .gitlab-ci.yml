@@ -1,0 +1,43 @@
+variables:  
+  DOCKERHUB_USER: saurabhdevops
+  IMAGE: k8-node
+# Set you dockerhub password as DOCKERHUB_PASSWD variable in gitlab ci secrets
+# OPENSHIFT_SERVER: openshift.example.org  --This is your openshift host here
+# OPENSHIFT_DOMAIN: example.org
+
+npm-test:
+  stage: build
+  image: node:argon
+  script:
+    - npm install
+    - npm run test
+  tags:
+   - DOCKER
+
+# The Docker build is currently automated with Docker Hub GitHub Build Automation feature and hence this step is optional.
+docker-build:
+  stage: build
+  image: docker
+  before_script:
+    - docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWD}
+  script:
+    - docker build -t ${DOCKERHUB_USER}/${IMAGE} .
+    - docker push ${DOCKERHUB_USER}/${IMAGE}
+  tags:
+    - DOCKER
+
+okd-deploy:
+  stage: deploy
+  when: manual
+  image: saurabhdevops/openshift-client
+  script:
+    - oc login $OPENSHIFT_SERVER --token=$OPENSHIFT_TOKEN --insecure-skip-tls-verify
+    - oc project k8node
+    # Deploy new version
+    - oc process -f okd-deployment.yml
+      -v OPENSHIFT_HOST=${OPENSHIFT_DOMAIN}
+      | oc apply -f -
+    # Wait for the rollout to finish
+    - oc rollout status dc/$IMAGENAME
+  tags:
+    - DOCKER
