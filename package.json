@@ -1,0 +1,25 @@
+{
+  "name": "k8-node",
+  "version": "1.0.0",
+  "description": "NodeJS app Exposing Version",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saurabhdevops/k8-node.git"
+  },
+  "keywords": [
+    "nodejs",
+    "k8",
+    "ci",
+    "cd"
+  ],
+  "author": "Saurabh Oza",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saurabhdevops/k8-node/issues"
+  },
+  "homepage": "https://github.com/saurabhdevops/k8-node#readme"
+}
