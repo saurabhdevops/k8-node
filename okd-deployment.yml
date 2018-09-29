@@ -1,0 +1,107 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: k8node
+  annotations:
+    description: "Deploy node js app in a best-practice way"
+    tags: "node, k8, nodejs, best-practice"
+    iconClass: "nodejs"
+labels:
+  template: "k8node-template"
+objects:
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: ${DEPLOYMENT_NAME}
+    name: ${DEPLOYMENT_NAME}
+  spec:
+    replicas: ${NO_OF_REPLICAS}
+    selector:
+      app: ${DEPLOYMENT_NAME}
+      deploymentconfig: ${DEPLOYMENT_NAME}
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: ${DEPLOYMENT_NAME}
+          template: "k8node-template"
+          deploymentconfig: ${DEPLOYMENT_NAME}
+      spec:
+        containers:
+        - image: 'saurabhdevops/k8-node'
+          imagePullPolicy: Always
+          name: ${DEPLOYMENT_NAME}
+          terminationMessagePath: /dev/termination-log
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: 8008
+              scheme: HTTP
+            initialDelaySeconds: 15
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+        restartPolicy: Always
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+
+- apiVersion: v1
+  kind: Route
+  metadata:
+    name: ${DEPLOYMENT_NAME}
+    labels:
+      app: ${DEPLOYMENT_NAME}
+  spec:
+    host: ${DEPLOYMENT_NAME}.${OPENSHIFT_HOST}
+    to:
+      kind: Service
+      name: ${DEPLOYMENT_NAME}
+    tls:
+      termination: edge
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: ${DEPLOYMENT_NAME}
+    labels:
+      app: ${DEPLOYMENT_NAME}
+  spec:
+    ports:
+    - port: 8008
+      protocol: TCP
+      targetPort: 8008
+    selector:
+      app: ${DEPLOYMENT_NAME}
+    sessionAffinity: None
+    type: ClusterIP
+
+parameters:
+- name: OPENSHIFT_HOST
+  description: OpenShift host name
+  required: true
+- name: DEPLOYMENT_NAME
+  description: "Name of the deployment"
+  required: true
+  value: "k8node"
+- name: NAMESPACE
+  description: "OpenShift project name from where the images should be taken from"
+  required: true
+  value: k8node
+- name: IMAGE_TAG
+  description: "Image tag to be used for deployment. I.e typically the git commit id"
+  required: true
+  value: "latest"
+- name: NO_OF_REPLICAS
+  description: "No of replicas you want to create"
+  required: true
+  value: "3"
