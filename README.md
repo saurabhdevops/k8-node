@@ -63,6 +63,7 @@ npm start
    * You will need to install a `Gitlab CI Runner` with [Docker](https://docs.gitlab.com/runner/install/docker.html) or [K8](https://docs.gitlab.com/runner/install/kubernetes.html) executors.
    * You need to tag your runner with `DOCKER` tag or [add your custom tag] in the [Gitlab CI File](.gitlab-ci.yml)
    * You can also use Jenkins for CI / CD by reusing the same concept(build steps in docker slave) with a combination of [jenkins](https://hub.docker.com/_/jenkins/), [jenkins docker slave](https://hub.docker.com/r/jenkinsci/slave/) & [pipeline plugin](https://jenkins.io/doc/book/pipeline/jenkinsfile/)
+   * *NOTE:* The [Jenkinsfile](Jenkinsfile) is just indicative of how it can be done with Jenkins and is not completely tested.
 
 ### HA & Fault Tolerance:
    * The k8s deployment is designed for high availability and fault tolerance.
