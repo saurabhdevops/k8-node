@@ -61,3 +61,20 @@ npm start
    * We are using [GitLab CI](https://about.gitlab.com/features/gitlab-ci-cd/) as our CI/CD tool here.
    * You will need to install a `Gitlab CI Runner` with [Docker](https://docs.gitlab.com/runner/install/docker.html) or [K8](https://docs.gitlab.com/runner/install/kubernetes.html) executors.
    * You need to tag your runner with `DOCKER` tag or [add your custom tag] in the [Gitlab CI File](.gitlab-ci.yml)
+   * You can also use Jenkins for CI / CD by reusing the same concept(build steps in docker slave) with a combination of [jenkins](https://hub.docker.com/_/jenkins/), [jenkins docker slave](https://hub.docker.com/r/jenkinsci/slave/) & [pipeline plugin](https://jenkins.io/doc/book/pipeline/jenkinsfile/)
+
+### HA & Fault Tolerance:
+   * The k8s deployment is designed for high availability and fault tolerance.
+   * As you can see [here](okd-deployment.yml#L19), we have configured the k8 deployment to run 3 replicas of the application. We have made it configurable via [NO_OF_REPLICAS](okd-deployment.yml#L104).
+   * K8s ensure that there are always 3 healthy pods/containers running of the application.
+   * The [readinessProbe](okd-deployment.yml#L44) helps kubernetes identify the health by making http calls to `version` endpoint. If this endpoint fails to respond with `HTTP 2xx` response, kubernetes will automatically evict that pod and replace it with a new one.
+   * Even if you terminate one of the pods forcefully, k8 will create a fresh one and always maintain 3 read replicas.
+   * Typically in k8 cluster, k8 automatically assigns the pods to different underlying nodes in the cluster. This ensures that even if one of the nodes in cluster is terminated, the other 2 pods will keep serving the requests and k8 will try to self heal and provision the 3rd node again maintaining the defined cluster state of 3 replicas.
+   * If k8 is deployed onto AWS using 3 different availability zones, k8s can read the AWS metadata and allocate one pod on a node in each availability zone. This means that even if there is a complete outage on one of the AZs, the app will still be running.
+
+### Rolling upgrade
+   * With each change in the docker image, we are triggering a [rollout](.gitlab-ci.yml#L38).
+   * This will trigger a rolling deployment as per the parameters mentioned [here](okd-deployment.yml#L25).
+   * The k8s will deploy one instance of new version and wait for the `readinessProbe` to pass. Once it passes, ONLY then will it terminate one pod from old deployment. It will then start with the next and so on.
+   * We have also mentioned `terminationGracePeriodSeconds` so that if a pod is already serving a request, it has time to finish those before being terminated.
+   * This will result in zero-downtime rolling upgrades.
