@@ -14,3 +14,13 @@ node app.js
 ```
 
    * Once you run this application, you can open your browser and hit http://localhost:8008/version to access your app. This should display the application version of your node js app.
+
+## Run with NPM
+   * NPM (https://www.npmjs.com/) is a default package manager for node.js apps. As a best practice, it is recommended runtime for node.js.
+   * This app uses npm as package manager.
+   * To run the app with npm, clone the repo and run:
+
+```
+npm start
+```
+
