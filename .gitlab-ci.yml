@@ -17,7 +17,8 @@ npm-test:
 # The Docker build is currently automated with Docker Hub GitHub Build Automation feature and hence this step is optional.
 docker-build:
   stage: build
-  only: master
+  only:
+    - master
   image: docker
   before_script:
     - docker login -u ${DOCKERHUB_USER} -p ${DOCKERHUB_PASSWD}
@@ -29,7 +30,8 @@ docker-build:
 
 okd-deploy-image-change:
   stage: deploy
-  only: master
+  only:
+    - master
   image: saurabhdevops/openshift-client
   script:
     - oc login $OPENSHIFT_SERVER --token=$OPENSHIFT_TOKEN --insecure-skip-tls-verify
@@ -42,7 +44,8 @@ okd-deploy-image-change:
 
 okd-deploy:
   stage: deploy
-  only: master
+  only:
+    - master
   #This is manual step as this need not run each time but just on a fresh deploy or configuration change only
   when: manual
   image: saurabhdevops/openshift-client
